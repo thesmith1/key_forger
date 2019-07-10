@@ -5,7 +5,7 @@ The Key Forger, a quick and dirty script that implements a custom mapping of key
 __author__ = 'Giorgio Fabbro'
 __copyright__ = 'Copyright (C) 2019 Giorgio Fabbro'
 __license__ = 'GNU General Public License v3.0'
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 
 from evdev import ecodes as e, InputDevice, list_devices, UInput, categorize
@@ -26,7 +26,7 @@ devices = []  # Global handle to all source devices
 async def listen(dev, ui, config):
     if int(dev.path[-1]) == main_dev_id:  # Main device
         async for ev in dev.async_read_loop():
-            if e.KEY[ev.code][4:] in digits_str and ev.value == 1:  # Change i3wm desktop
+            if e.KEY[ev.code][4:] in digits_str and ev.value == 1 and len(dev.active_keys()) == 1:  # Change i3wm desktop, while still allowing for symbols with LEFTSHIFT
                 ui.write_event(InputEvent(ev.sec, ev.usec, ev.type, e.KEY_LEFTALT, 1))  # ALT On
                 ui.syn()
                 ui.write_event(InputEvent(ev.sec, ev.usec, ev.type, ev.code, 1))  # Digit On
