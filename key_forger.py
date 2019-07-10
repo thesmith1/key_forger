@@ -5,7 +5,7 @@ The Key Forger, a quick and dirty script that performs a many-to-many mapping of
 __author__ = 'Giorgio Fabbro'
 __copyright__ = 'Copyright (C) 2019 Giorgio Fabbro'
 __license__ = 'GNU General Public License v3.0'
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 
 from evdev import ecodes as e, InputDevice, list_devices, UInput, categorize
@@ -22,16 +22,16 @@ async def listen(dev, ui, config):
             exit()
         elif ev.code == e.KEY_RESERVED:  # Synchronization events
             ui.write_event(ev)
-            ui.syn()
         elif e.KEY[ev.code][4:] in config.keys() and ev.value == 1:  # Detect only keydown of keys in config file
             out_codes = [e.ecodes['KEY_' + code] for code in config[e.KEY[ev.code][4:]]]
             for code in out_codes:
                 new_ev = InputEvent(ev.sec, ev.usec, ev.type, code, 1)
                 ui.write_event(new_ev)
+                ui.syn()
             for code in reversed(out_codes):
                 new_ev = InputEvent(ev.sec, ev.usec, ev.type, code, 0)
                 ui.write_event(new_ev)
-            ui.syn()
+                ui.syn()
 
 
 if __name__ == '__main__':
